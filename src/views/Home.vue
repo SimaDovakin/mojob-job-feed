@@ -1,8 +1,8 @@
 <template>
   <div class="home">
     <job-feed
-      :job-listings="[]"
-      :position-functions="positionFunctionFilters"
+      :jobListings="jobListings"
+      :positionFunctions="positionFunctionFilters"
     />
   </div>
 </template>
@@ -11,7 +11,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import JobFeed from '@/components/JobFeed.vue';
 import BaseApi from '@/api-requests/api';
-import { IPage, PositionFunction } from '@/models/models';
+import { IPage, PositionFunction, JobListing } from '@/models/models';
 
 @Component({
   components: {
@@ -21,6 +21,7 @@ import { IPage, PositionFunction } from '@/models/models';
 export default class Home extends Vue {
   private mojobApi: BaseApi | null = null;
   private positionFunctionFilters: PositionFunction[] = [];
+  private jobListings: JobListing[] = [];
 
   /**
    * Here you can do necessary request to our
@@ -52,6 +53,21 @@ export default class Home extends Vue {
       console.log('Failed loading position function filters');
       console.log(e);
     }
+
+	try {
+      const jobListingsResponsePage: IPage<JobListing> =
+        await this.mojobApi.getJobListings();
+		if (jobListingsResponsePage.results) {
+          this.jobListings = jobListingsResponsePage.results;
+          console.log(JSON.stringify(this.jobListings));
+          console.log(this.jobListings);
+		} else {
+          console.log('Failed loading job listings');
+		}
+	} catch (e) {
+	  console.log('Failed loading job listings');
+      console.log(e);
+	}
   }
 }
 </script>
