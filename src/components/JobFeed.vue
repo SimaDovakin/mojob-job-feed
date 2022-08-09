@@ -1,17 +1,19 @@
 <template>
   <div class="job-feed">
-	  <div v-for="job in jobListings" :key="job.job.id" class="job-card">
-		  <h3 class="job-title">{{ job.job.title }}</h3>
-		  <div class="job-info">
-			  <p>
-				  <span class="company-name">{{ job.job.unit.name }}</span>
-				  &bull;
-				  <span class="position-function">{{ job.job.position_function.name_en }}</span>
-				  &bull;
-				  <span class="due-date">{{ job.job.due_date }}</span>
-			  </p>
+	  <div class="container">
+		  <div v-for="job in jobListings" :key="job.job.id" class="job-card">
+			  <h3 class="job-title">{{ job.job.title }}</h3>
+			  <div class="job-info">
+				  <p>
+					  <span class="company-name">{{ job.job.unit.name }}</span>
+					  &bull;
+					  <span class="position-function">{{ job.job.position_function.name_en }}</span>
+					  &bull;
+					  <span class="due-date">{{ job.job.due_date }}</span>
+				  </p>
+			  </div>
 		  </div>
-	  </div>
+      </div>
   </div>
 </template>
 
@@ -35,7 +37,7 @@ export default class JobFeed extends Vue {
 </script>
 
 <style scoped>
-.job-feed {
+.container {
 	display: flex;
 	flex-direction: column;
 	max-width: 1080px;
