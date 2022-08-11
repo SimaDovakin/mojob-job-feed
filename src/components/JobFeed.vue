@@ -54,7 +54,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Watch, Vue } from 'vue-property-decorator';
 import { JobListing, PositionFunction } from '@/models/models';
 
 @Component
@@ -67,10 +67,9 @@ export default class JobFeed extends Vue {
   private showPositionFilters: boolean = false;
   private selectedPositionFilters: Array<number> = [];
 
-  private mounted() {
-    console.log('From JobFeed.vue');
-	console.log(this.jobListings);
-	console.log(this.positionFunctions);
+  @Watch('selectedPositionFilters')
+  onSelectedFiltersChanged(newValue: Array<number>, oldValue: Array<number>): void {
+	this.$emit('selected-filters', newValue);
   }
 
   public togglePositionFilters(): void {

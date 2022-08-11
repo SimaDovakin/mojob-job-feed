@@ -25,7 +25,7 @@ export default class BaseApi {
 	  usePagination: boolean = true,
 	  page: number = 1,
 	  pageSize: number = 5,
-	  positionFunctions: Array<number> = []
+	  positionFunctions: number[] = []
   ): Promise<IPage<JobListing>> =>
 
 	this.axios

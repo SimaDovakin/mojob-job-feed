@@ -1,6 +1,7 @@
 <template>
   <div class="home">
     <job-feed
+	  @selected-filters="setSelectedFilters"
       :jobListings="jobListings"
       :positionFunctions="positionFunctionFilters"
     />
@@ -57,6 +58,29 @@ export default class Home extends Vue {
 	try {
       const jobListingsResponsePage: IPage<JobListing> =
         await this.mojobApi.getJobListings();
+		if (jobListingsResponsePage.results) {
+          this.jobListings = jobListingsResponsePage.results;
+          console.log(JSON.stringify(this.jobListings));
+          console.log(this.jobListings);
+		} else {
+          console.log('Failed loading job listings');
+		}
+	} catch (e) {
+	  console.log('Failed loading job listings');
+      console.log(e);
+	}
+  }
+
+  public async setSelectedFilters(selectedFilters: Array<number>) {
+	console.log('From Home.vue:', selectedFilters);
+    this.mojobApi = new BaseApi(
+      'https://test-api.mojob.io/public/',
+      this.axios
+    );
+
+	try {
+      const jobListingsResponsePage: IPage<JobListing> =
+		await this.mojobApi.getJobListings(true, 1, 5, selectedFilters);
 		if (jobListingsResponsePage.results) {
           this.jobListings = jobListingsResponsePage.results;
           console.log(JSON.stringify(this.jobListings));
