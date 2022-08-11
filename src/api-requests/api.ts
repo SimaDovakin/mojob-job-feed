@@ -21,8 +21,16 @@ export default class BaseApi {
    * https://test-api.mojob.io/public/docs/
    */
 
-  public getJobListings = (): Promise<IPage<JobListing>> =>
+  public getJobListings = (
+	  usePagination: boolean = true,
+	  page: number = 1,
+	  pageSize: number = 5,
+	  positionFunctions: Array<number> = []
+  ): Promise<IPage<JobListing>> =>
+
 	this.axios
-      .get(`${this.baseUrl}job/listings/?include_open=False&page=1&page_size=5&use_mojob_feed_filter=True&use_pagination=True`)
+      .get(
+		  `${this.baseUrl}job/listings/?position_functions=${[...new Set(positionFunctions)].join()}&include_open=False&page=${page}&page_size=${pageSize}&use_mojob_feed_filter=True&use_pagination=${usePagination ? 'True' : 'False'}`
+	  )
 	  .then((response) => response.data);
 }
