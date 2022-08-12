@@ -41,24 +41,9 @@ export default class Home extends Vue {
    */
   private async mounted() {
     // Here is an example on how to retrieve job position function filters
-    this.mojobApi = new BaseApi(
-      'https://test-api.mojob.io/public/',
-      this.axios
-    );
-    try {
-      const jobLocationFiltersResponsePage: IPage<PositionFunction> =
-        await this.mojobApi.getPositionFunctions();
-      if (jobLocationFiltersResponsePage.results) {
-        this.positionFunctionFilters = jobLocationFiltersResponsePage.results;
-        console.log(JSON.stringify(this.positionFunctionFilters, null, 2));
-        console.log(this.positionFunctionFilters);
-      } else {
-        console.log('Failed loading position function filters');
-      }
-    } catch (e) {
-      console.log('Failed loading position function filters');
-      console.log(e);
-    }
+	this.mojobApi = this.setUpApi();
+
+	await this.fetchJobListings();
 
 	try {
       const jobListingsResponsePage: IPage<JobListing> =
@@ -80,7 +65,7 @@ export default class Home extends Vue {
 	console.log('From Home.vue:', selectedFilters);
 	this.selectedPositionFilters = selectedFilters;
 
-	this.fetchJobListings();
+	await this.fetchJobListings();
   }
 
   public async setPageSize(pageSize: number) {
@@ -92,7 +77,7 @@ export default class Home extends Vue {
 	this.selectedPageSize = processedPageSize;
 	this.usePagination = usePagination;
 
-	this.fetchJobListings();	
+	await this.fetchJobListings();	
   }
 
   public async fetchJobListings() {
