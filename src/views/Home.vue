@@ -27,6 +27,7 @@ export default class Home extends Vue {
   private selectedPositionFilters: number[] = [];
   private selectedPageSize: number = 5;
   private usePagination: boolean = true;
+  private page: number = 1;
 
   /**
    * Here you can do necessary request to our
@@ -79,14 +80,27 @@ export default class Home extends Vue {
 	console.log('From Home.vue:', selectedFilters);
 	this.selectedPositionFilters = selectedFilters;
 
-    this.mojobApi = new BaseApi(
-      'https://test-api.mojob.io/public/',
-      this.axios
-    );
+	this.fetchJobListings();
+  }
 
+  public async setPageSize(pageSize: number) {
+	console.log('From Home.vue (page size):', pageSize);
+
+	const processedPageSize: number = pageSize > 0 ? pageSize : 5;
+	const usePagination: boolean = pageSize > 0 ? true : false;
+
+	this.selectedPageSize = processedPageSize;
+	this.usePagination = usePagination;
+
+	this.fetchJobListings();	
+  }
+
+  public async fetchJobListings() {
+	this.mojobApi = this.setUpApi();
+	
 	try {
       const jobListingsResponsePage: IPage<JobListing> =
-		await this.mojobApi.getJobListings(this.usePagination, 1, this.selectedPageSize, this.selectedPositionFilters);
+		await this.mojobApi.getJobListings(this.usePagination, this.page, this.selectedPageSize, this.selectedPositionFilters);
 		if (jobListingsResponsePage.results) {
           this.jobListings = jobListingsResponsePage.results;
           console.log(JSON.stringify(this.jobListings));
@@ -104,38 +118,17 @@ export default class Home extends Vue {
 	}
   }
 
-  public async setPageSize(pageSize: number) {
-	console.log('From Home.vue (page size):', pageSize);
+  public setUpApi(): BaseApi {
+	if (this.mojobApi == null) {	
+	  this.mojobApi = new BaseApi(
+	    'https://test-api.mojob.io/public/',
+		this.axios
+	  );
 
-    this.mojobApi = new BaseApi(
-      'https://test-api.mojob.io/public/',
-      this.axios
-    );
-
-	const processedPageSize: number = pageSize > 0 ? pageSize : 5;
-	const usePagination: boolean = pageSize > 0 ? true : false;
-
-	this.selectedPageSize = processedPageSize;
-	this.usePagination = usePagination;
-
-	try {
-      const jobListingsResponsePage: IPage<JobListing> =
-		await this.mojobApi.getJobListings(this.usePagination, 1, this.selectedPageSize, this.selectedPositionFilters);
-		if (jobListingsResponsePage.results) {
-          this.jobListings = jobListingsResponsePage.results;
-          console.log(JSON.stringify(this.jobListings));
-          console.log(this.jobListings);
-		} else if (!this.usePagination && jobListingsResponsePage) {
-		  this.jobListings = jobListingsResponsePage;
-          console.log(JSON.stringify(this.jobListings));
-          console.log(this.jobListings);
-		} else {
-          console.log('Failed loading job listings');
-		}
-	} catch (e) {
-	  console.log('Failed loading job listings');
-      console.log(e);
+	  return this.mojobApi;
 	}
+
+	return this.mojobApi;
   }
 }
 </script>
