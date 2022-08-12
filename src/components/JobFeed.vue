@@ -31,8 +31,24 @@
 					  </ul>
 				  </div>
 			  </div>
-			  <div class="dropdown count-per-page">
-				  <p class="selected">5 per page</p>
+			  <div class="dropdown count-per-page" @click="togglePageSettings">
+				  <p class="selected">{{ makePageSettingLabel(selectedPageSetting) }}</p>
+				  <div class="options pagination-settings" v-show="showPaginationSettings" @click.stop="">
+					  <ul>
+					      <li v-for="pageSetting in pageSettings"
+							  :key="'page-size-' + pageSetting"
+							  v-show="pageSetting !== selectedPageSetting">
+							  <label :for="'page-size-' + pageSetting">
+								  <input type="radio" 
+								  		 name="pageSize" 
+										 :value="pageSetting"
+										 :id="'page-size-' + pageSetting"
+										 v-model="selectedPageSetting">
+								  {{ makePageSettingLabel(pageSetting) }}
+							  </label>
+						  </li>
+					  </ul>
+				  </div>
 			  </div>
 		  </div>
 		  <div class="job-list">
@@ -65,19 +81,39 @@ export default class JobFeed extends Vue {
   private positionFunctions!: PositionFunction[];
 
   private showPositionFilters: boolean = false;
+  private showPaginationSettings: boolean = false;
   private selectedPositionFilters: Array<number> = [];
+  private selectedPageSetting: number = 5;
+  private pageSettings: number[] = [5, 25, 0]; // 0 for 'Display all'
 
   @Watch('selectedPositionFilters')
   onSelectedFiltersChanged(newValue: Array<number>, oldValue: Array<number>): void {
 	this.$emit('selected-filters', newValue);
   }
 
+  @Watch('selectedPageSetting')
+  onPageSettingChanged(newValue: number, oldValue: number): void {
+    this.$emit('changed-page-setting', newValue);
+  }
+
+  get selectedPageLabel(): string {
+	  return "TODO: Format page setting label"
+  }
+
   public togglePositionFilters(): void {
 	this.showPositionFilters = !this.showPositionFilters;
   }
 
+  public togglePageSettings(): void {
+    this.showPaginationSettings = !this.showPaginationSettings;
+  }
+
   public addPositionFilter(e: Event, positionFilterId: number): void {
     console.log(e.target);
+  }
+
+  public makePageSettingLabel(pageSize: number): string {
+    return pageSize > 0 ? `${pageSize} per page` : 'Display all';
   }
 }
 </script>
@@ -131,5 +167,10 @@ export default class JobFeed extends Vue {
 	background-color: white;
 	-webkit-box-shadow: 1px 8px 10px 5px rgba(0,0,0,0.29);
 	box-shadow: 1px 8px 10px 5px rgba(0,0,0,0.29);
+}
+
+.dropdown .options.pagination-settings {
+	width: 146px;
+	height: 62px;
 }
 </style>

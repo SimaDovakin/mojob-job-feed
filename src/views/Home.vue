@@ -2,6 +2,7 @@
   <div class="home">
     <job-feed
 	  @selected-filters="setSelectedFilters"
+	  @changed-page-setting="setPageSize"
       :jobListings="jobListings"
       :positionFunctions="positionFunctionFilters"
     />
@@ -23,6 +24,8 @@ export default class Home extends Vue {
   private mojobApi: BaseApi | null = null;
   private positionFunctionFilters: PositionFunction[] = [];
   private jobListings: JobListing[] = [];
+  private selectedPositionFilters: number[] = [];
+  private selectedPageSize: number = 5;
 
   /**
    * Here you can do necessary request to our
@@ -73,6 +76,8 @@ export default class Home extends Vue {
 
   public async setSelectedFilters(selectedFilters: Array<number>) {
 	console.log('From Home.vue:', selectedFilters);
+	this.selectedPositionFilters = selectedFilters;
+
     this.mojobApi = new BaseApi(
       'https://test-api.mojob.io/public/',
       this.axios
@@ -83,6 +88,38 @@ export default class Home extends Vue {
 		await this.mojobApi.getJobListings(true, 1, 5, selectedFilters);
 		if (jobListingsResponsePage.results) {
           this.jobListings = jobListingsResponsePage.results;
+          console.log(JSON.stringify(this.jobListings));
+          console.log(this.jobListings);
+		} else {
+          console.log('Failed loading job listings');
+		}
+	} catch (e) {
+	  console.log('Failed loading job listings');
+      console.log(e);
+	}
+  }
+
+  public async setPageSize(pageSize: number) {
+	console.log('From Home.vue (page size):', pageSize);
+	this.selectedPageSize = pageSize;
+
+    this.mojobApi = new BaseApi(
+      'https://test-api.mojob.io/public/',
+      this.axios
+    );
+
+	const processedPageSize: number = pageSize > 0 ? pageSize : 5;
+	const usePagination: boolean = pageSize > 0 ? true : false;
+
+	try {
+      const jobListingsResponsePage: IPage<JobListing> =
+		await this.mojobApi.getJobListings(usePagination, 1, processedPageSize, this.selectedPositionFilters);
+		if (jobListingsResponsePage.results) {
+          this.jobListings = jobListingsResponsePage.results;
+          console.log(JSON.stringify(this.jobListings));
+          console.log(this.jobListings);
+		} else if (!usePagination && jobListingsResponsePage) {
+		  this.jobListings = jobListingsResponsePage;
           console.log(JSON.stringify(this.jobListings));
           console.log(this.jobListings);
 		} else {
