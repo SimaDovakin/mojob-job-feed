@@ -46,19 +46,19 @@ export default class Home extends Vue {
 	await this.fetchJobListings();
 
 	try {
-      const jobListingsResponsePage: IPage<JobListing> =
-        await this.mojobApi.getJobListings();
-		if (jobListingsResponsePage.results) {
-          this.jobListings = jobListingsResponsePage.results;
-          console.log(JSON.stringify(this.jobListings));
-          console.log(this.jobListings);
-		} else {
-          console.log('Failed loading job listings');
-		}
-	} catch (e) {
-	  console.log('Failed loading job listings');
+      const jobLocationFiltersResponsePage: IPage<PositionFunction> =
+        await this.mojobApi.getPositionFunctions();
+      if (jobLocationFiltersResponsePage.results) {
+        this.positionFunctionFilters = jobLocationFiltersResponsePage.results;
+        console.log(JSON.stringify(this.positionFunctionFilters, null, 2));
+        console.log(this.positionFunctionFilters);
+      } else {
+        console.log('Failed loading position function filters');
+      }
+    } catch (e) {
+      console.log('Failed loading position function filters');
       console.log(e);
-	}
+    }
   }
 
   public async setSelectedFilters(selectedFilters: Array<number>) {
